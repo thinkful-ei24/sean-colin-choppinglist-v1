@@ -42,7 +42,27 @@ app.get('/recipes', (req, res) => {
 	res.json(Recipes.get());
 });
 
+app.post('/recipes', jsonParser, (req, res) => {
+  const requiredFields = ['name', 'ingredients'];
 
+  // if(Object.keys(req.body).length !== requiredFields.length) {
+  //   return res.status(400).send('Argument length does not match. Expected name and ingredients.');
+  // }
+
+  for(let reqField of requiredFields) {
+    if(!(reqField in req.body)) {
+      // tell the client that the request is bad
+      return res.status(400).send(`Missing ${reqField} in request body`);
+    }
+  }
+
+  res.json(Recipes.create(req.body.name, req.body.ingredients));
+});
+
+app.delete('/recipes/:id', (req, res) => {
+  Recipes.delete(req.params.id);
+  res.status(204).end();
+});
 
 
 app.listen(process.env.PORT || 8080, () => {
